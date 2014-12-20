@@ -226,6 +226,7 @@ class Curl
         $user_agent = (isset($this->server['HTTP_USER_AGENT'])) ? $this->server['HTTP_USER_AGENT'] : 'Curl';
         $this->opt(CURLOPT_URL, $url);
         $this->opt(CURLOPT_USERAGENT, $user_agent);
+        $this->opt(CURLOPT_SSL_VERIFYHOST, FALSE);
         $this->opt(CURLOPT_SSL_VERIFYPEER, FALSE);
         $this->opt(CURLOPT_RETURNTRANSFER);
         $this->opt(CURLOPT_FORBID_REUSE);
