@@ -7,8 +7,7 @@
  * @since 1.0
  * @copyright (c) 2014, Agus Suroyo
  */
-class Curl
-{
+class Curl {
 
     var $ch;
     var $error;
@@ -24,15 +23,14 @@ class Curl
     /**
      * Initialize all dependencies
      */
-    public function __construct()
-    {
+    public function __construct() {
         is_callable('curl_init') OR exit('cURL is not installed in your system.');
         $this->response = FALSE;
         $this->_resp = array();
         $this->use_auth = FALSE;
         $this->username = '';
         $this->password = '';
-        $this->server = (is_callable('filter_input_array')) ? filter_input_array(INPUT_SERVER) : $_SERVER;
+        $this->server = $_SERVER;
         $this->init();
     }
 
@@ -42,15 +40,12 @@ class Curl
      * @param string $password
      * @return \Curl
      */
-    public function setAuth($username = '', $password = '')
-    {
+    public function setAuth($username = '', $password = '') {
         $this->use_auth = TRUE;
-        if (!empty($username))
-        {
+        if (!empty($username)) {
             $this->username = $username;
         }
-        if (!empty($password))
-        {
+        if (!empty($password)) {
             $this->password = $password;
         }
         return $this;
@@ -60,8 +55,7 @@ class Curl
      * 
      * @return \Curl
      */
-    public function init()
-    {
+    public function init() {
         $this->ch = curl_init();
         return $this;
     }
@@ -72,10 +66,8 @@ class Curl
      * @param boolean $value
      * @return \Curl
      */
-    public function opt($option, $value = TRUE)
-    {
-        if (empty($this->ch))
-        {
+    public function opt($option, $value = TRUE) {
+        if (empty($this->ch)) {
             $this->init();
         }
         curl_setopt($this->ch, $option, $value);
@@ -87,15 +79,12 @@ class Curl
      * @param resource $ch
      * @return \Curl
      */
-    public function exec($ch = '')
-    {
-        if (!empty($ch))
-        {
+    public function exec($ch = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         $this->response = curl_exec($this->ch);
-        if (!$this->response)
-        {
+        if (!$this->response) {
             $this->error();
             $this->response = $this->error;
         }
@@ -108,10 +97,8 @@ class Curl
      * @param resource $ch
      * @return \Curl
      */
-    public function close($ch = '')
-    {
-        if (!empty($ch))
-        {
+    public function close($ch = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         curl_close($this->ch);
@@ -124,10 +111,8 @@ class Curl
      * @param constants $options
      * @return \Curl
      */
-    public function info($ch = '', $options = '')
-    {
-        if (!empty($ch))
-        {
+    public function info($ch = '', $options = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         $this->info = curl_getinfo($this->ch, $options);
@@ -139,10 +124,8 @@ class Curl
      * @param resource $ch
      * @return \Curl
      */
-    public function error($ch = '')
-    {
-        if (!empty($ch))
-        {
+    public function error($ch = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         $this->error = curl_error($this->ch);
@@ -154,10 +137,8 @@ class Curl
      * @param resource $ch
      * @return \Curl
      */
-    public function reset($ch = '')
-    {
-        if (!empty($ch))
-        {
+    public function reset($ch = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         curl_reset($this->ch);
@@ -169,10 +150,8 @@ class Curl
      * @param resource $ch
      * @return \Curl
      */
-    public function pause($ch = '')
-    {
-        if (!empty($ch))
-        {
+    public function pause($ch = '') {
+        if (!empty($ch)) {
             $this->ch = $ch;
         }
         curl_pause($this->ch);
@@ -188,38 +167,29 @@ class Curl
      * @param array $options
      * @return boolean
      */
-    protected function __request($method = 'GET', $url = '', $data = '', $options = array())
-    {
-        if (empty($this->ch))
-        {
+    protected function __request($method = 'GET', $url = '', $data = '', $options = array()) {
+        if (empty($this->ch)) {
             $this->init();
         }
-        if (empty($url) OR empty($method))
-        {
+        if (empty($url) OR empty($method)) {
             return FALSE;
         }
         $method = strtoupper($method);
-        if ($method !== 'GET')
-        {
-            if ($method == 'POST')
-            {
+        if ($method !== 'GET') {
+            if ($method == 'POST') {
                 $this->opt(CURLOPT_POST);
-            } else
-            {
+            } else {
                 $this->opt(CURLOPT_CUSTOMREQUEST, $method);
                 $this->opt(CURLOPT_HTTPHEADER, array('X-HTTP-Method-Override: ' . $method));
             }
-            if (!empty($data))
-            {
-                if (is_array($data) OR is_object($data))
-                {
+            if (!empty($data)) {
+                if (is_array($data) OR is_object($data)) {
                     $data = http_build_query($data);
                 }
                 $this->opt(CURLOPT_POSTFIELDS, $data);
             }
         }
-        if ($this->use_auth)
-        {
+        if ($this->use_auth) {
             $this->opt(CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             $this->opt(CURLOPT_USERPWD, $this->username . ':' . $this->password);
         }
@@ -231,12 +201,9 @@ class Curl
         $this->opt(CURLOPT_RETURNTRANSFER);
         $this->opt(CURLOPT_FORBID_REUSE);
         $this->opt(CURLOPT_FRESH_CONNECT);
-        $this->opt(CURLOPT_COOKIESESSION);
         /** Set in Loop (Accept Object Options) */
-        if (!empty($options))
-        {
-            foreach ($options as $option => $value)
-            {
+        if (!empty($options)) {
+            foreach ($options as $option => $value) {
                 $this->opt($option, $value);
             }
         }
@@ -249,8 +216,7 @@ class Curl
      * @param string $url
      * @return response
      */
-    public function get($url = '')
-    {
+    public function get($url = '') {
         $this->__request('GET', $url);
         return $this->response;
     }
@@ -262,8 +228,7 @@ class Curl
      * @param string $options
      * @return response
      */
-    public function post($url = '', $data = '', $options = array())
-    {
+    public function post($url = '', $data = '', $options = array()) {
         $this->__request('POST', $url, $data, $options);
         return $this->response;
     }
@@ -275,8 +240,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function put($url = '', $data = '', $options = array())
-    {
+    public function put($url = '', $data = '', $options = array()) {
         $this->__request('PUT', $url, $data, $options);
         return $this->response;
     }
@@ -288,8 +252,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function patch($url = '', $data = '', $options = array())
-    {
+    public function patch($url = '', $data = '', $options = array()) {
         $this->__request('PATCH', $url, $data, $options);
         return $this->response;
     }
@@ -301,8 +264,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function delete($url = '', $data = '', $options = array())
-    {
+    public function delete($url = '', $data = '', $options = array()) {
         $this->__request('DELETE', $url, $data, $options);
         return $this->response;
     }
@@ -314,8 +276,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function link($url = '', $data = '', $options = array())
-    {
+    public function link($url = '', $data = '', $options = array()) {
         $this->__request('LINK', $url, $data, $options);
         return $this->response;
     }
@@ -327,8 +288,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function unlink($url = '', $data = '', $options = array())
-    {
+    public function unlink($url = '', $data = '', $options = array()) {
         $this->__request('UNLINK', $url, $data, $options);
         return $this->response;
     }
@@ -340,8 +300,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function lock($url = '', $data = '', $options = array())
-    {
+    public function lock($url = '', $data = '', $options = array()) {
         $this->__request('LOCK', $url, $data, $options);
         return $this->response;
     }
@@ -353,8 +312,7 @@ class Curl
      * @param array $options
      * @return response
      */
-    public function propfind($url = '', $data = '', $options = array())
-    {
+    public function propfind($url = '', $data = '', $options = array()) {
         $this->__request('PROPFIND', $url, $data, $options);
         return $this->response;
     }
@@ -364,13 +322,10 @@ class Curl
      * @param type $xml xmldata
      * @return json
      */
-    public function xml2json($xml = '')
-    {
-        if ($xml !== '')
-        {
+    public function xml2json($xml = '') {
+        if ($xml !== '') {
             $xml = simplexml_load_string($xml);
-        } else
-        {
+        } else {
             $xml = array();
         }
         return json_encode($xml);
